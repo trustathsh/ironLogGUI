@@ -38,24 +38,36 @@
  */
 package de.hshannover.f4.trust.ironloggui;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
+import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 
 public class IronLogGui {
 	
 	private static final String VERSION = "${project.version}";
 
-	private static final String FILENAME = "config/configuration.yml";
+	private static final String FILENAME = "/config/configuration.yml";
 
-	private static final Logger LOGGER = Logger.getLogger(IronLogGui.class);
+	private static final Logger LOGGER = Logger.getLogger(IronLogGui.class.getName());
 	
 	public static void main(String[] args) {
 		
 		LOGGER.info("Starting irontemplate version " + VERSION);
 
 		LOGGER.info("Loading configuration file: " + FILENAME);
-		Properties configuration = new Properties(FILENAME);
+		String config = IronLogGui.class.getResource(FILENAME).getPath();
+		Properties configuration = new Properties(config);
+		
+		try {
+			List<String> files = (List<String>) configuration.getValue("ironloggui.searchfor");
+			System.out.println(files);
+		} catch (PropertyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
