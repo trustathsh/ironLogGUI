@@ -40,12 +40,17 @@ package de.hshannover.f4.trust.ironloggui;
 
 import java.util.List;
 
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.ironloggui.windows.MainWindow;
 
-public class IronLogGui {
+public final class IronLogGui {
 	
 	private static final String VERSION = "${project.version}";
 
@@ -53,21 +58,61 @@ public class IronLogGui {
 
 	private static final Logger LOGGER = Logger.getLogger(IronLogGui.class.getName());
 	
-	public static void main(String[] args) {
+	private static final String ROOTDIRFORSEARCH = "ironloggui.rootdir";
+	private static final String SEARCHFORFILES = "ironloggui.searchfor";
+	private static final String EXPLICITFILES = "ironloggui.explicitfiles";
+	
+	
+	/**
+	 * Death constructor for code convention -> final class because utility
+	 * class
+	 */
+	private IronLogGui() {
+	}
+	
+	
+	/**
+	 * The main method loads or initialize the Configuration and logging.
+	 * After that it calls the initialize method of the main window
+	 * @throws InterruptedException 
+	 * 
+	 */
+	
+	public static void main(String[] args) throws InterruptedException {
 		
-		LOGGER.info("Starting irontemplate version " + VERSION);
+		LOGGER.info("Starting IronLogGui version " + VERSION);
 
 		LOGGER.info("Loading configuration file: " + FILENAME);
 		String config = IronLogGui.class.getResource(FILENAME).getPath();
 		Properties configuration = new Properties(config);
-		
+
 		try {
-			List<String> files = (List<String>) configuration.getValue("ironloggui.searchfor");
-			System.out.println(files);
+			String rootdir = configuration.getString(ROOTDIRFORSEARCH);
 		} catch (PropertyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.warn("Couldnt load " +ROOTDIRFORSEARCH+ " correctly: " + e);
+		}		
+		try {
+			@SuppressWarnings("unchecked")
+			List<String> searchForFileNames = (List<String>) configuration.getValue(SEARCHFORFILES);
+		} catch (PropertyException e) {
+			LOGGER.warn("Couldnt load " +SEARCHFORFILES+ " correctly: " + e);
 		}
+		try {
+			@SuppressWarnings("unchecked")
+			List<String> explicitFileNames = (List<String>) configuration.getValue(EXPLICITFILES);
+		} catch (PropertyException e) {
+			LOGGER.warn("Couldnt load " +EXPLICITFILES+ " correctly: " + e);
+		}
+		LOGGER.info("Loading configuration file done");
+		
+		
+		MainWindow mainW = new MainWindow();
+		mainW.setVisible(true);		
+		
+		JTextArea one = mainW.addTab("irond");
+		JTextArea two = mainW.addTab("visit");
+		one.setText("blub");
+		two.setText("blab");
 
 	}
 

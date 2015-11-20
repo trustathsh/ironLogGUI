@@ -4,7 +4,7 @@ ironloggui:
     rootdir: ..
     # list filename strings for searching
     searchfor: 
-        - irondemoLog.txt
+        - IrondemoLog.txt
     # list explicite files here
     explicitfiles:
 
