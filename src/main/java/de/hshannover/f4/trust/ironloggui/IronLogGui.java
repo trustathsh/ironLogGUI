@@ -38,16 +38,16 @@
  */
 package de.hshannover.f4.trust.ironloggui;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
 import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.ironloggui.utils.LogFileWorker;
 import de.hshannover.f4.trust.ironloggui.windows.MainWindow;
 
 public final class IronLogGui {
@@ -107,13 +107,16 @@ public final class IronLogGui {
 		
 		
 		MainWindow mainW = new MainWindow();
-		mainW.setVisible(true);		
 		
-		JTextArea one = mainW.addTab("irond");
-		JTextArea two = mainW.addTab("visit");
-		one.setText("blub");
-		two.setText("blab");
-
+		try {
+			LogFileWorker worker = new LogFileWorker(mainW,"irond","/home/rohdem/Schreibtisch/text.txt");
+			new Thread(worker).start();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		mainW.setVisible(true);
 	}
 
 }

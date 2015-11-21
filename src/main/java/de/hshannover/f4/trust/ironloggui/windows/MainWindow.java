@@ -2,7 +2,7 @@ package de.hshannover.f4.trust.ironloggui.windows;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.HashMap;
 import javax.swing.*;
 
 public class MainWindow extends JFrame {
@@ -12,7 +12,9 @@ public class MainWindow extends JFrame {
 	 */
 	private static final long serialVersionUID = 7034670749972011389L;
 
-	JTabbedPane mTabbedPane;
+	private JTabbedPane mTabbedPane;
+	
+	private HashMap<String,JTextArea> mTextAreas = new HashMap<String,JTextArea>();
 
 	public MainWindow() {
 		init();
@@ -20,6 +22,7 @@ public class MainWindow extends JFrame {
 	}
 
 	public void init() {
+		this.setTitle("IronLogGUI");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setSize(1280, 720);
 		this.setResizable(true);
@@ -27,13 +30,19 @@ public class MainWindow extends JFrame {
 		this.getContentPane().add(mTabbedPane);
 	}
 
-	synchronized public JTextArea addTab(String component) {
-		JTextArea editorPane = new JTextArea();
-		editorPane.setEditable(false);
-		JScrollPane jsp = new JScrollPane(editorPane);
-		mTabbedPane.addTab(component, null, jsp, component);
-		return editorPane;
+	synchronized public void addTab(String logFileName) {
+		JTextArea textArea = new JTextArea();
+		textArea.setEditable(false);
+		JScrollPane jsp = new JScrollPane(textArea);
+		mTabbedPane.addTab(logFileName, null, jsp, logFileName);
+		mTextAreas.put(logFileName, textArea);
 	}
+	
+	synchronized public void appendTextInTab(String logFileName,String text) {
+		JTextArea textArea = mTextAreas.get(logFileName);
+		textArea.append(text);
+	}
+	
 
 	public void initMenu() {
 
