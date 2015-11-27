@@ -38,85 +38,84 @@
  */
 package de.hshannover.f4.trust.ironloggui;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JTextArea;
 
 import org.apache.log4j.Logger;
 
-import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
+import de.hshannover.f4.trust.ironloggui.utils.FileSearcher;
 import de.hshannover.f4.trust.ironloggui.utils.LogFileWorker;
 import de.hshannover.f4.trust.ironloggui.windows.MainWindow;
 
 public final class IronLogGui {
-	
+
 	private static final String VERSION = "${project.version}";
 
-	private static final String FILENAME = "/config/configuration.yml";
-
 	private static final Logger LOGGER = Logger.getLogger(IronLogGui.class.getName());
-	
-	private static final String ROOTDIRFORSEARCH = "ironloggui.rootdir";
-	private static final String SEARCHFORFILES = "ironloggui.searchfor";
-	private static final String EXPLICITFILES = "ironloggui.explicitfiles";
-	
-	
+
 	/**
-	 * Death constructor for code convention -> final class because utility
-	 * class
+	 * Death constructor for code convention -> final class because utility class
 	 */
 	private IronLogGui() {
 	}
-	
-	
+
 	/**
-	 * The main method loads or initialize the Configuration and logging.
-	 * After that it calls the initialize method of the main window
-	 * @throws InterruptedException 
+	 * The main method loads or initialize the Configuration and logging. After that it calls the initialize method of
+	 * the main window
+	 * 
+	 * @throws InterruptedException
 	 * 
 	 */
-	
+
 	public static void main(String[] args) throws InterruptedException {
-		
+
 		LOGGER.info("Starting IronLogGui version " + VERSION);
 
-		LOGGER.info("Loading configuration file: " + FILENAME);
-		String config = IronLogGui.class.getResource(FILENAME).getPath();
-		Properties configuration = new Properties(config);
+		Configuration.init();
+
+		MainWindow mainW = new MainWindow();
+
+		List<Path> files = new ArrayList<Path>();
 
 		try {
-			String rootdir = configuration.getString(ROOTDIRFORSEARCH);
-		} catch (PropertyException e) {
-			LOGGER.warn("Couldnt load " +ROOTDIRFORSEARCH+ " correctly: " + e);
-		}		
-		try {
-			@SuppressWarnings("unchecked")
-			List<String> searchForFileNames = (List<String>) configuration.getValue(SEARCHFORFILES);
-		} catch (PropertyException e) {
-			LOGGER.warn("Couldnt load " +SEARCHFORFILES+ " correctly: " + e);
+
+			for (String filename : Configuration.getFilenamesForSearch()) {
+				FileSearcher finder = new FileSearcher(filename);
+				Path curdir = Paths.get("").toAbsolutePath();
+				Path rootdir = Paths.get(curdir.toString(), Configuration.getRootDir());
+
+				try {
+					Files.walkFileTree(rootdir.normalize(), finder);
+				} catch (IOException e) {
+					LOGGER.error(e);
+				}
+				files.addAll(finder.done());
+			}
+		} catch (PropertyException e1) {
+			LOGGER.error(e1);
 		}
+		
 		try {
-			@SuppressWarnings("unchecked")
-			List<String> explicitFileNames = (List<String>) configuration.getValue(EXPLICITFILES);
+			for (String filename : Configuration.getExplicitFileNames()) {
+				Path file = Paths.get(filename);
+				files.add(file);
+			}
 		} catch (PropertyException e) {
-			LOGGER.warn("Couldnt load " +EXPLICITFILES+ " correctly: " + e);
+			LOGGER.error(e);
 		}
-		LOGGER.info("Loading configuration file done");
 		
+		Collections.sort(files);
 		
-		MainWindow mainW = new MainWindow();
-		
-		try {
-			LogFileWorker worker = new LogFileWorker(mainW,"irond","/home/rohdem/Schreibtisch/text.txt");
+		for (Path file : files) {
+			LogFileWorker worker = new LogFileWorker(mainW, file.getFileName().toString(), file.toString());
 			new Thread(worker).start();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 		mainW.setVisible(true);
 	}
-
 }
