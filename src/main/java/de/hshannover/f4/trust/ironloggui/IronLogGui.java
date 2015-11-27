@@ -79,8 +79,6 @@ public final class IronLogGui {
 
 		Configuration.init();
 
-		MainWindow mainW = new MainWindow();
-
 		List<Path> files = new ArrayList<Path>();
 
 		try {
@@ -100,7 +98,7 @@ public final class IronLogGui {
 		} catch (PropertyException e1) {
 			LOGGER.error(e1);
 		}
-		
+
 		try {
 			for (String filename : Configuration.getExplicitFileNames()) {
 				Path file = Paths.get(filename);
@@ -109,9 +107,11 @@ public final class IronLogGui {
 		} catch (PropertyException e) {
 			LOGGER.error(e);
 		}
-		
+
 		Collections.sort(files);
-		
+
+		MainWindow mainW = new MainWindow();
+
 		for (Path file : files) {
 			LogFileWorker worker = new LogFileWorker(mainW, file.getFileName().toString(), file.toString());
 			new Thread(worker).start();
