@@ -50,6 +50,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
+/**
+ * This class generates the mainwindow and provides functions to add tabs to the
+ * mainwindow.
+ * 
+ * @author Marius Rohde
+ * 
+ */
+
 public class MainWindow extends JFrame {
 
 	/**
@@ -61,11 +69,17 @@ public class MainWindow extends JFrame {
 
 	private HashMap<String, JTextArea> mTextAreas = new HashMap<String, JTextArea>();
 
+	/**
+	 * Constructor for window creation
+	 */
 	public MainWindow() {
 		init();
 		initMenu();
 	}
 
+	/**
+	 * Init method to define window size and behavior
+	 */
 	public void init() {
 		this.setTitle("IronLogGUI");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -75,19 +89,9 @@ public class MainWindow extends JFrame {
 		this.getContentPane().add(mTabbedPane);
 	}
 
-	public synchronized  void addTab(String logFileName) {
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
-		JScrollPane jsp = new JScrollPane(textArea);
-		mTabbedPane.addTab(logFileName, null, jsp, logFileName);
-		mTextAreas.put(logFileName, textArea);
-	}
-
-	public synchronized void appendTextInTab(String logFileName, String text) {
-		JTextArea textArea = mTextAreas.get(logFileName);
-		textArea.append(text);
-	}
-
+	/**
+	 * Init method to generate a menu
+	 */
 	public void initMenu() {
 
 		JMenuBar menuBar;
@@ -111,4 +115,24 @@ public class MainWindow extends JFrame {
 
 		this.setJMenuBar(menuBar);
 	}
+
+	/**
+	 * Method to add a new tab to the main window
+	 */
+	public synchronized void addTab(String logFileName) {
+		JTextArea textArea = new JTextArea();
+		textArea.setEditable(false);
+		JScrollPane jsp = new JScrollPane(textArea);
+		mTabbedPane.addTab(logFileName, null, jsp, logFileName);
+		mTextAreas.put(logFileName, textArea);
+	}
+
+	/**
+	 * Method to add a text in a existing tab
+	 */
+	public synchronized void appendTextInTab(String logFileName, String text) {
+		JTextArea textArea = mTextAreas.get(logFileName);
+		textArea.append(text);
+	}
+
 }

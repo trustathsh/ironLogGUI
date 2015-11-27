@@ -45,10 +45,21 @@ import org.apache.log4j.Logger;
 import de.hshannover.f4.trust.ironcommon.properties.Properties;
 import de.hshannover.f4.trust.ironcommon.properties.PropertyException;
 
+/**
+ * This class loads the configuration file from the file system and provides a
+ * set of constants and a getter method to access these values.
+ * 
+ * @author Marius Rohde
+ * 
+ */
+
 public final class Configuration {
 
 	private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
 
+	/**
+	 * The path to the configuration file.
+	 */
 	private static final String FILENAME = "/config/configuration.yml";
 
 	private static final String ROOTDIRFORSEARCH = "ironloggui.rootdir";
@@ -58,11 +69,16 @@ public final class Configuration {
 	private static Properties mConfiguration;
 
 	/**
-	 * Death constructor for code convention -> final class because utility class
+	 * Dead constructor for code convention -> final class because utility class
 	 */
 	private Configuration() {
 	}
 
+	/**
+	 * Loads the configuration file. Every time this method is called the file
+	 * is read again.
+	 * 
+	 */
 	public static void init() {
 
 		LOGGER.info("Loading configuration file: " + FILENAME);
@@ -71,15 +87,36 @@ public final class Configuration {
 
 	}
 
+	/**
+	 * Getter for the rootdir in which searched for files.
+	 * 
+	 * @return the string of rootdir
+	 * @throws PropertyException
+	 *             what the name says
+	 */
 	public static String getRootDir() throws PropertyException {
 		return mConfiguration.getString(ROOTDIRFORSEARCH);
 	}
 
+	/**
+	 * Getter for the list of files that will be searched.
+	 * 
+	 * @return the list of filename pattern
+	 * @throws PropertyException
+	 *             what the name says
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<String> getFilenamesForSearch() throws PropertyException {
 		return (List<String>) mConfiguration.getValue(SEARCHFORFILES);
 	}
 
+	/**
+	 * Getter for the list of explicit files that will be opened.
+	 * 
+	 * @return the list of filenames
+	 * @throws PropertyException
+	 *             what the name says
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<String> getExplicitFileNames() throws PropertyException {
 		return (List<String>) mConfiguration.getValue(EXPLICITFILES);

@@ -53,6 +53,15 @@ import de.hshannover.f4.trust.ironloggui.utils.FileSearcher;
 import de.hshannover.f4.trust.ironloggui.utils.LogFileWorker;
 import de.hshannover.f4.trust.ironloggui.windows.MainWindow;
 
+/**
+ * This class starts the application It creates the threads for reading log
+ * files and the gui. In Addition it search for filenames in the directories. It
+ * setups logging too
+ * 
+ * @author Marius Rohde
+ * 
+ */
+
 public final class IronLogGui {
 
 	private static final String VERSION = "${project.version}";
@@ -60,16 +69,17 @@ public final class IronLogGui {
 	private static final Logger LOGGER = Logger.getLogger(IronLogGui.class.getName());
 
 	/**
-	 * Death constructor for code convention -> final class because utility class
+	 * Dead constructor for code convention -> final class because utility class
 	 */
 	private IronLogGui() {
 	}
 
 	/**
-	 * The main method loads or initialize the Configuration and logging. After that it calls the initialize method of
-	 * the main window
+	 * The main method loads or initialize the Configuration and logging. After
+	 * that it calls the initialize method of the main window
 	 * 
 	 * @throws InterruptedException
+	 *             What the name says
 	 * 
 	 */
 

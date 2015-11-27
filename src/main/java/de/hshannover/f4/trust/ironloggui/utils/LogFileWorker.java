@@ -47,6 +47,12 @@ import org.apache.log4j.Logger;
 
 import de.hshannover.f4.trust.ironloggui.windows.MainWindow;
 
+/**
+ * This class reads a logfile and updates the text in a tab of main window.
+ * 
+ * @author Marius Rohde
+ * 
+ */
 public class LogFileWorker implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(LogFileWorker.class.getName());
@@ -55,6 +61,16 @@ public class LogFileWorker implements Runnable {
 	private MainWindow mMainWindow;
 	private String mLogFileName;
 
+	/**
+	 * Constructor creates a new matcher with specified filename search pattern
+	 * 
+	 * @param mainWindow
+	 *            for inserting Tabs
+	 * @param logFileName
+	 *            for identify the right tab
+	 * @param logFilePath
+	 *            for reading log text
+	 */
 	public LogFileWorker(MainWindow mainWindow, String logFileName, String logFilePath) {
 		mLogFile = new File(logFilePath);
 		mMainWindow = mainWindow;

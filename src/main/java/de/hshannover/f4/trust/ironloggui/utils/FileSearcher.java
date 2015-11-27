@@ -50,6 +50,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+/**
+ * This callback class is a util to search files recursive in directory.
+ * 
+ * @author Marius Rohde
+ * 
+ */
+
 public class FileSearcher extends SimpleFileVisitor<Path> {
 
 	private static final Logger LOGGER = Logger.getLogger(FileSearcher.class.getName());
@@ -58,12 +65,22 @@ public class FileSearcher extends SimpleFileVisitor<Path> {
 	private int mNumMatches = 0;
 	private List<Path> mPathes = new ArrayList<Path>();
 
+	/**
+	 * Constructor creates a new matcher with specified filename search pattern
+	 * 
+	 * @param pattern
+	 *            String for pattern matching
+	 */
 	public FileSearcher(String pattern) {
 		mMatcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
 	}
 
-	// Compares the glob pattern against
-	// the file or directory name.
+	/**
+	 * Compares the glob pattern against the file or directory name.
+	 * 
+	 * @param file
+	 *            current file in directory
+	 */
 	public void find(Path file) {
 		Path name = file.getFileName();
 		if (name != null && mMatcher.matches(name)) {
@@ -73,8 +90,11 @@ public class FileSearcher extends SimpleFileVisitor<Path> {
 		}
 	}
 
-	// Prints the total number of
-	// matches to standard out.
+	/**
+	 * Prints the total number of matches to standard out.
+	 * 
+	 * @return List with path to found files
+	 */
 	public List<Path> done() {
 		LOGGER.info("Matched files: " + mNumMatches);
 		return mPathes;
