@@ -54,9 +54,8 @@ import de.hshannover.f4.trust.ironloggui.utils.LogFileWorker;
 import de.hshannover.f4.trust.ironloggui.windows.MainWindow;
 
 /**
- * This class starts the application It creates the threads for reading log
- * files and the gui. In Addition it search for filenames in the directories. It
- * setups logging too
+ * This class starts the application It creates the threads for reading log files and the gui. In Addition it search for
+ * filenames in the directories. It setups logging too
  * 
  * @author Marius Rohde
  * 
@@ -75,8 +74,8 @@ public final class IronLogGui {
 	}
 
 	/**
-	 * The main method loads or initialize the Configuration and logging. After
-	 * that it calls the initialize method of the main window
+	 * The main method loads or initialize the Configuration and logging. After that it calls the initialize method of
+	 * the main window
 	 * 
 	 * @throws InterruptedException
 	 *             What the name says
@@ -94,16 +93,18 @@ public final class IronLogGui {
 		try {
 
 			for (String filename : Configuration.getFilenamesForSearch()) {
-				FileSearcher finder = new FileSearcher(filename);
-				Path curdir = Paths.get("").toAbsolutePath();
-				Path rootdir = Paths.get(curdir.toString(), Configuration.getRootDir());
+				if (!filename.equals("")) {
+					FileSearcher finder = new FileSearcher(filename);
+					Path curdir = Paths.get("").toAbsolutePath();
+					Path rootdir = Paths.get(curdir.toString(), Configuration.getRootDir());
 
-				try {
-					Files.walkFileTree(rootdir.normalize(), finder);
-				} catch (IOException e) {
-					LOGGER.error(e);
+					try {
+						Files.walkFileTree(rootdir.normalize(), finder);
+					} catch (IOException e) {
+						LOGGER.error(e);
+					}
+					files.addAll(finder.done());
 				}
-				files.addAll(finder.done());
 			}
 		} catch (PropertyException e1) {
 			LOGGER.error(e1);
@@ -111,8 +112,10 @@ public final class IronLogGui {
 
 		try {
 			for (String filename : Configuration.getExplicitFileNames()) {
-				Path file = Paths.get(filename);
-				files.add(file);
+				if (!filename.equals("")) {
+					Path file = Paths.get(filename);
+					files.add(file);
+				}
 			}
 		} catch (PropertyException e) {
 			LOGGER.error(e);

@@ -1,12 +1,11 @@
 # ironloggui configuration file
 ironloggui:
     # relative Rootdir for searching filename
-    rootdir: /../..
+    rootdir: /..
     # list filename strings for searching. File searcher will search for *name*
     searchfor: 
-        - 'text.txt'
-        #- 'test.txt'
+        - '*IrondemoLog.txt'
     # list explicite files here (absolute Path required)
     explicitfiles:
-        - '/home/rohdem/Arbeitsflaeche/test.txt'
+        - ''
 
