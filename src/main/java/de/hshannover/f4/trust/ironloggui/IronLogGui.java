@@ -67,6 +67,8 @@ public final class IronLogGui {
 
 	private static final Logger LOGGER = Logger.getLogger(IronLogGui.class.getName());
 
+	private static List<Path> mfiles = new ArrayList<Path>();
+
 	/**
 	 * Dead constructor for code convention -> final class because utility class
 	 */
@@ -74,24 +76,25 @@ public final class IronLogGui {
 	}
 
 	/**
-	 * The main method loads or initialize the Configuration and logging. After that it calls the initialize method of
-	 * the main window
+	 * This method searches the files specified by configuration file
 	 * 
-	 * @throws InterruptedException
-	 *             What the name says
+	 * @param confRootdir
+	 *            relative rootdir for search
+	 * 
+	 * @param filenamesForSearch
+	 *            files to be searched
+	 * 
+	 * @param explicitFileNames
+	 *            files to load
+	 * 
+	 * @return only not known (new) Files)
 	 * 
 	 */
+	public static List<Path> loadFiles() {
 
-	public static void main(String[] args) throws InterruptedException {
-
-		LOGGER.info("Starting IronLogGui version " + VERSION);
-
-		Configuration.init();
-
-		List<Path> files = new ArrayList<Path>();
+		List<Path> newFiles = new ArrayList<Path>();
 
 		try {
-
 			for (String filename : Configuration.getFilenamesForSearch()) {
 				if (!filename.equals("")) {
 					FileSearcher finder = new FileSearcher(filename);
@@ -103,7 +106,11 @@ public final class IronLogGui {
 					} catch (IOException e) {
 						LOGGER.error(e);
 					}
-					files.addAll(finder.done());
+					for (Path file : finder.done()) {
+						if (!mfiles.contains(file)) {
+							newFiles.add(file);
+						}
+					}
 				}
 			}
 		} catch (PropertyException e1) {
@@ -114,21 +121,53 @@ public final class IronLogGui {
 			for (String filename : Configuration.getExplicitFileNames()) {
 				if (!filename.equals("")) {
 					Path file = Paths.get(filename);
-					files.add(file);
+					if (!mfiles.contains(file)) {
+						newFiles.add(file);
+					}
 				}
 			}
 		} catch (PropertyException e) {
 			LOGGER.error(e);
 		}
 
-		Collections.sort(files);
+		Collections.sort(newFiles);
+		mfiles.addAll(newFiles);
+		return newFiles;
+	}
 
-		MainWindow mainW = new MainWindow();
-
+	/**
+	 * This method starts the worker threads to display the content of the files in a tab
+	 * 
+	 * @param mainW
+	 *            Window where tabs be inserted
+	 * 
+	 * @param files
+	 *            files to be displayed
+	 * 
+	 */
+	public static void loadFilesInTabs(MainWindow mainW, List<Path> files) {
 		for (Path file : files) {
 			LogFileWorker worker = new LogFileWorker(mainW, file.getFileName().toString(), file.toString());
 			new Thread(worker).start();
 		}
+	}
+
+	/**
+	 * The main method loads or initialize the Configuration and logging. After that it calls the initialize method of
+	 * the main window
+	 * 
+	 * @throws InterruptedException
+	 *             What the name says
+	 * 
+	 */
+	public static void main(String[] args) throws InterruptedException {
+
+		LOGGER.info("Starting IronLogGui version " + VERSION);
+
+		Configuration.init();
+		MainWindow mainW = new MainWindow();
+		List<Path> files = loadFiles();
+		loadFilesInTabs(mainW, files);
 		mainW.setVisible(true);
 	}
 }

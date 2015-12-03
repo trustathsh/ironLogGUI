@@ -40,19 +40,24 @@ package de.hshannover.f4.trust.ironloggui.windows;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
+
+import de.hshannover.f4.trust.ironloggui.IronLogGui;
 
 /**
- * This class generates the mainwindow and provides functions to add tabs to the
- * mainwindow.
+ * This class generates the mainwindow and provides functions to add tabs to the mainwindow.
  * 
  * @author Marius Rohde
  * 
@@ -67,6 +72,8 @@ public class MainWindow extends JFrame {
 
 	private JTabbedPane mTabbedPane;
 
+	private MainWindow mThis;
+
 	private HashMap<String, JTextArea> mTextAreas = new HashMap<String, JTextArea>();
 
 	/**
@@ -75,6 +82,7 @@ public class MainWindow extends JFrame {
 	public MainWindow() {
 		init();
 		initMenu();
+		mThis = this;
 	}
 
 	/**
@@ -96,22 +104,34 @@ public class MainWindow extends JFrame {
 
 		JMenuBar menuBar;
 		JMenu menu;
-		JMenuItem menuItem;
+		JMenuItem menuItem1;
+		JMenuItem menuItem2;
 
 		menuBar = new JMenuBar();
 
 		menu = new JMenu("File");
 		menuBar.add(menu);
 
-		menuItem = new JMenuItem("Exit", null);
-		menuItem.addActionListener(new ActionListener() {
+		menuItem2 = new JMenuItem("Reload Files", null);
+		menuItem2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				List<Path> files = IronLogGui.loadFiles();
+				IronLogGui.loadFilesInTabs(mThis, files);
+			}
+		});
+		menu.add(menuItem2);
+
+		menuItem1 = new JMenuItem("Exit", null);
+		menuItem1.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(NORMAL);
 			}
 		});
-		menu.add(menuItem);
+		menu.add(menuItem1);
 
 		this.setJMenuBar(menuBar);
 	}
@@ -122,7 +142,10 @@ public class MainWindow extends JFrame {
 	public synchronized void addTab(String logFileName) {
 		JTextArea textArea = new JTextArea();
 		textArea.setEditable(false);
+		DefaultCaret caret = (DefaultCaret) textArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		JScrollPane jsp = new JScrollPane(textArea);
+		jsp.setViewportView(textArea);
 		mTabbedPane.addTab(logFileName, null, jsp, logFileName);
 		mTextAreas.put(logFileName, textArea);
 	}
@@ -132,7 +155,15 @@ public class MainWindow extends JFrame {
 	 */
 	public synchronized void appendTextInTab(String logFileName, String text) {
 		JTextArea textArea = mTextAreas.get(logFileName);
-		textArea.append(text);
+		JScrollBar jsb = ((JScrollPane) textArea.getParent().getParent()).getVerticalScrollBar();
+		int extent = jsb.getModel().getExtent();
+		if ((jsb.getValue() + extent) == jsb.getMaximum()) {
+			textArea.append(text);
+			textArea.setCaretPosition(textArea.getDocument().getLength());
+		} else {
+			textArea.append(text);
+		}
+
 	}
 
 }
